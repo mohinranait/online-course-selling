@@ -1,9 +1,10 @@
+import AddCourse from "../../components/form/AddCourse";
 
 
 const CourseCreate = () => {
     return (
         <div>
-            Create
+            <AddCourse />
         </div>
     );
 };

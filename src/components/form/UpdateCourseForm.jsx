@@ -1,0 +1,346 @@
+/* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable react/prop-types */
+import { useNavigate } from "react-router-dom";
+import ButtonPrimary from "../buttons/ButtonPrimary";
+import { useEffect, useState } from "react";
+import useAxios from "../../hooks/useAxios";
+import { useSelector } from "react-redux";
+import data from "../../services/data";
+import Input from "../Input/Input";
+import Select from "react-select"
+import { toast } from "react-toastify";
+import { singleImage } from "../../services/uploadImage";
+
+
+const days = [
+    {_id: 1, value:"Saturday", label:"Saturday"},
+    {_id: 2, value:"Sunday", label:"Sunday"},
+    {_id: 3, value:"Monday", label:"Monday"},
+    {_id: 4, value:"Tuesday", label:"Tuesday"},
+    {_id: 5, value:"Wednesday", label:"Wednesday"},
+    {_id: 6, value:"Thursday", label:"Thursday"},
+    {_id: 7, value:"Friday", label:"Friday"},
+]
+
+const times = [
+    {_id: 1, value:"12 AM", label:"12 AM"},
+    {_id: 2, value:"01 AM", label:"01 AM"},
+    {_id: 3, value:"02 AM", label:"02 AM"},
+    {_id: 4, value:"03 AM", label:"03 AM"},
+    {_id: 5, value:"04 AM", label:"04 AM"},
+    {_id: 6, value:"05 AM", label:"05 AM"},
+    {_id: 7, value:"06 AM", label:"06 AM"},
+    {_id: 8, value:"07 AM", label:"07 AM"},
+    {_id: 9, value:"08 AM", label:"08 AM"},
+    {_id: 10, value:"09 AM", label:"09 AM"},
+    {_id: 11, value:"10 AM", label:"10 AM"},
+    {_id: 12, value:"11 AM", label:"11 AM"},
+    {_id: 13, value:"12 PM", label:"12 PM"},
+    {_id: 14, value:"01 PM", label:"01 PM"},
+    {_id: 15, value:"02 PM", label:"02 PM"},
+    {_id: 16, value:"03 PM", label:"03 PM"},
+    {_id: 17, value:"04 PM", label:"04 PM"},
+    {_id: 18, value:"05 PM", label:"05 PM"},
+    {_id: 19, value:"06 PM", label:"06 PM"},
+    {_id: 20, value:"07 PM", label:"07 PM"},
+    {_id: 21, value:"08 PM", label:"08 PM"},
+    {_id: 22, value:"09 PM", label:"09 PM"},
+    {_id: 23, value:"10 PM", label:"10 PM"},
+    {_id: 24, value:"11 PM", label:"11 PM"},
+]
+
+const UpdateCourseForm = ({getCourse}) => {
+    const [timeSelect, setTimeSelect] = useState({
+        firstTime:{},
+        secondTime:{}
+    })
+    const navigate = useNavigate();
+    const [file, setFile] = useState("")
+    const axios = useAxios();
+    const {user} = useSelector(state => state.user)
+    const [sedule, setSedule] = useState({
+        days: [],
+        firstTime:'',
+        secondTime:'',
+    })
+
+    
+
+    const [course, setCourse] = useState({
+        name: "",
+        status: 'Active',
+        descripton: "",
+        category: data?.categorys[0],
+        author : user?._id,
+        price : null,
+        location: 'Online',
+        certificate: 'Yes',
+        prerequisites: ''
+    })
+
+
+
+    const handleCourse = async e => {
+        e.preventDefault();
+
+  
+        const {name,descripton,price} = course;
+        const {firstTime, secondTime, days} = sedule;
+        if(days?.length == 0) return toast.error("Select days")
+        if(!firstTime) return toast.error("Start time")
+        if(!secondTime) return toast.error("End time")
+        
+        if( !name ) return toast.error("Name is required")
+        if( !price ) return toast.error("Price is required")
+        if( !descripton ) return toast.error("descripton is required")
+
+
+        // Date and time formate
+        let formate = sedule.days?.map(item => item?.value).join(', ');
+        let formateShedule = formate + " | " + sedule.firstTime + " - "+ sedule.secondTime 
+
+        let image = getCourse?.image;
+        if(file){
+            image = await singleImage(file)
+        }
+
+        try {
+            const courseObj = {
+                ...course,
+                schedule:formateShedule,
+                image,
+                price: Number(course?.price),
+                certificate: course?.certificate == "Yes" ? true : false
+            }
+            
+            const res = await axios.patch(`/course/${getCourse?._id}?userId=${user?._id}`, courseObj);
+            if(res.data.success){
+                navigate('/user/your-course')
+                setCourse({
+                    ...course,
+                    name: "",
+                    status: 'Active',
+                    descripton: "",
+                    category: "",
+                    author : user?._id,
+                    price : null,
+                })
+                toast.success("Created")
+
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const handleFileChange = e => {
+        setFile(e.target.files[0]);
+    }
+
+    useEffect( () => {
+        setCourse({
+            name: getCourse?.name,
+            status: getCourse?.status,
+            descripton: getCourse?.descripton,
+            category: getCourse?.category,
+            price : getCourse?.price || null,
+            location: getCourse?.location,
+            certificate: getCourse?.certificate ?  'Yes' : "No" ,
+            prerequisites: getCourse?.prerequisites.join(',')
+        })
+        const getDays = getCourse?.schedule?.split(' | ')[0].split(', ');
+        let innArr = [];
+        getDays?.map(item => {
+            const existsDay =days?.find(d => d.value == item)
+            if(existsDay){
+                innArr = [...innArr, existsDay];
+            }
+        } )
+       
+        const [firstTime,secondTime] = getCourse?.schedule?.split(' | ')[1]?.split(' - ');
+        let fTime = {}
+        let sTime = {}
+        times?.forEach(item => {
+            if(item?.value == firstTime){
+                fTime = item
+            }
+            if(item?.value == secondTime){
+                sTime = item
+            }
+        })
+        setSedule({
+            days:innArr,
+            firstTime: firstTime,
+            secondTime: secondTime,
+        })
+        setTimeSelect({
+            firstTime: fTime,
+            secondTime: sTime,
+        })
+    },[getCourse])
+    return (
+        <>
+             <form onSubmit={handleCourse} className="py-4">
+                <div className="space-y-5">
+                   <div className='lg:grid grid-cols-2 gap-5'>
+                        <div>
+                            <label htmlFor="" className='text-gray-600 text-sm'>Course name</label>
+                            <Input 
+                                type={'text'} 
+                                placeholder={"Name"} 
+                                value={course.name} 
+                                onChange={(e) => setCourse({...course, name:e.target.value})} 
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="" className='text-gray-600 text-sm'>Price</label>
+                            <Input 
+                                type={'number'} 
+                                placeholder={"Price"} 
+                                value={course.price} 
+                                onChange={(e) => setCourse({...course, price:e.target.value})} 
+                            />
+                        </div>
+                   </div>
+                    <div className='lg:grid grid-cols-4 gap-5'>
+                        <div>
+                            <label htmlFor="" className='text-gray-600 text-sm'>Status</label>
+                            <select 
+                            name="" id="" 
+                            className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                            onChange={(e) => setCourse({...course, status:e.target.value})} 
+                            >
+                                <option value="Active">Active Status</option>
+                                <option value="Active" selected={course?.status == 'Active'}>Active</option>
+                                <option value="inActive" selected={course?.status == 'InActive'}>In-Active</option>
+                            </select>
+                        </div>
+                        <div>
+                        <label htmlFor="" className='text-gray-600 text-sm'>Category Select</label>
+                            <select 
+                            name="" id="" 
+                            className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                            onChange={(e) => setCourse({...course, category:e.target.value})} 
+                            >
+                                <option value="">All categorys</option>
+                                {
+                                    data.categorys?.map(item =>  <option key={item?._id}  value={item?.name} selected={course?.category == item?.name}>{item?.name}</option> )
+                                }
+                            
+                            </select>
+                        </div>
+                        <div>
+                        <label htmlFor="" className='text-gray-600 text-sm'>Location</label>
+                            <select 
+                            name="" id="" 
+                            className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                            onChange={(e) => setCourse({...course, location:e.target.value})} 
+                            >
+                                <option value="">Course lcoation</option>
+                                <option value="Online" selected={course?.location == "Online"}>Online</option>
+                                <option value="Offline" selected={course?.location == "Offline"}>Offline</option>
+                            
+                            </select>
+                        </div>
+                       <div>
+                       <label htmlFor="" className='text-gray-600 text-sm'>Certificate</label>
+                        <select 
+                            name="" id="" 
+                            className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                            onChange={(e) => setCourse({...course, certificate:e.target.value})} 
+                            >
+                                <option value="">Certificate</option>
+                                <option value="Yes" selected={course?.certificate == 'Yes'}>Yes</option>
+                                <option value="No" selected={course?.certificate == 'No'}>No</option>
+                            
+                            </select>
+                       </div>
+                    </div>
+                    <div className='grid lg:grid-cols-2 gap-5'>
+                        <div>
+                        <label htmlFor="" className='text-gray-600 text-sm'>Dates</label>
+                            <Select
+                                // defaultValue={}
+                                isMulti
+                                options={days}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                // onChange={(e) => {
+                                //     console.log([...e,           e]);
+                                // }}
+                                value={sedule?.days}
+                                onChange={(e) => setSedule( {...sedule, days:e} )}
+                            />
+                        </div>
+                        <div className='grid grid-cols-2 gap-1'>
+                            <div>
+                            <label htmlFor="" className='text-gray-600 text-sm'>Start time</label>
+                                <Select
+                                    value={timeSelect.firstTime}
+                                    options={times}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={(e) => setSedule( {...sedule, firstTime:e.value} )}
+                                />
+                            </div>
+                            <div>
+                            <label htmlFor="" className='text-gray-600 text-sm'>End time</label>
+                                <Select
+                                    value={timeSelect.secondTime}
+                                    options={times}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={(e) => setSedule( {...sedule, secondTime:e.value} )}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className='file_upload px-5 py-5 relative border-4 bg-white border-dotted border-gray-300 rounded-lg'>
+                        <div className='flex flex-col w-max  mx-auto text-center'>
+                            <label>
+                                <input
+                                className='text-sm cursor-pointer w-36 hidden'
+                                type='file'
+                                name='image'
+                                id='image'
+                                accept='image/*'
+                                hidden
+                                multiple
+                                onChange={handleFileChange}
+                                // onChange={(e) => setUploadImageText(e.target.files[0].name) }
+                                />
+                                <div className='bg-primary py-2 overflow-x-auto max-w-[250px] overflow-hidden text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-primary'>
+                                    <span>{"Upload profile"}</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                   <div>
+                    <label htmlFor="" className='text-gray-600 text-sm'>Separated by comma (,)</label>
+                    <textarea 
+                    name="" id="" 
+                    cols="30" rows="2" 
+                    className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all ' placeholder="Pre Requisites"
+                    value={course.prerequisites} 
+                    onChange={(e) => setCourse({...course, prerequisites:e.target.value.split(',')})}
+                    > </textarea>
+                   </div>
+                    <textarea 
+                    name="" id="" 
+                    cols="30" rows="3" 
+                    className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all ' placeholder="Note..."
+                    value={course.descripton} 
+                    onChange={(e) => setCourse({...course, descripton:e.target.value})}
+                    > </textarea>
+                    <div>
+                        <ButtonPrimary type={'submit'} options={'w-full'}>
+                            Save course
+                        </ButtonPrimary>
+                    </div>
+                </div>  
+            </form>  
+        </>
+    );
+};
+
+export default UpdateCourseForm;

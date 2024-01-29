@@ -12,6 +12,8 @@ import CourseLists from "../pages/User/CourseLists";
 import ModuleAdd from "../pages/User/ModuleAdd";
 import UserAccount from "../pages/User/UserAccount";
 import PrivateRoute from "./PrivateRoute";
+import CourseCreate from "../pages/User/CourseCreate";
+import UpdateCourse from "../pages/User/UpdateCourse";
 const myRoutes = createBrowserRouter([
     {
         path:'/',
@@ -34,8 +36,9 @@ const myRoutes = createBrowserRouter([
                 element : <Courses />
             },
             {
-                path: "/course",
-                element : <Course />
+                path: "/course/:id",
+                element : <Course />,
+                loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
             },
             {
                 path: "/user",
@@ -54,12 +57,22 @@ const myRoutes = createBrowserRouter([
                         element: <CourseLists />
                     },
                     {
-                        path: "module-manage",
-                        element: <ModuleAdd />
+                        path: "module-manage/:id",
+                        element: <ModuleAdd />,
+                        loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
                     },
                     {
                         path: "account",
                         element: <UserAccount />
+                    },
+                    {
+                        path: "new-course",
+                        element: <CourseCreate />
+                    },
+                    {
+                        path: "update-course/:id",
+                        element: <UpdateCourse />,
+                        loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
                     },
                 ]
             },

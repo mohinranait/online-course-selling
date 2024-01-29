@@ -35,7 +35,6 @@ const UserAccountForm = () => {
             avater = await singleImage(file)
         }
 
-        console.log(avater);
         const userObj = {
             ...formValue,
             avater,

@@ -1,4 +1,5 @@
 
+import data from '../../services/data';
 import CategoryCart from '../card/CategoryCart';
 import SectionTitle from '../sectionTitle/SectionTitle';
 
@@ -10,12 +11,10 @@ const HomeCategory = () => {
                    <SectionTitle title={'Brows Categorys'} subtitle={'Popular topic to learn'} />
                 </div>
                 <div className='grid gap-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-6'>
-                    <CategoryCart />
-                    <CategoryCart />
-                    <CategoryCart />
-                    <CategoryCart />
-                    <CategoryCart />
-                    <CategoryCart />
+                    {
+                        data.categorys?.map(category =>  <CategoryCart key={category?._id} category={category} /> )
+                    }
+                  
                 </div>
             </div>
         </section>
