@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
 import { BsCart2 } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../redux/features/user/authSlice";
 
 
 
 const Header = () => {
+    const {user} = useSelector(state => state.user);
+    const dispatch = useDispatch()
     return (
         <header className="bg-white">
             <div className="box">
@@ -22,18 +26,34 @@ const Header = () => {
                     <div className="flex gap-5">
                         <ul className="hidden md:flex items-center ">
                             <li><Link to={'/'} className="text-sm font-medium px-3 py-2">Home</Link></li>
-                            <li><Link to={'/'} className="text-sm font-medium px-3 py-2">Course</Link></li>
-                            <li><Link to={'/'} className="text-sm font-medium px-3 py-2">About</Link></li>
+                            <li><Link to={'/courses'} className="text-sm font-medium px-3 py-2">Course</Link></li>
+                            {
+                                !user?._id && <>
+                                 <li><Link to={'/login'} className="text-sm font-medium px-3 py-2">Login</Link></li>
+                            <li><Link to={'/register'} className="text-sm font-medium px-3 py-2">Register</Link></li>
+                            </>
+                            }
+                           
                         </ul>
                         <button className="relative">
                             <BsCart2 size={25} />
                             <span className="w-[18px] h-[18px] flex items-center -right-2 justify-center rounded-full bg-primary text-white text-[10px] font-medium absolute -top-2">2</span>
                         </button>
-                        <button className="flex items-center gap-1">
-                            <span className="text-sm font-medium">Mohin Rana</span>
-                            <FaRegUserCircle size={25} />
-                           
-                        </button>
+                        {
+                            user?._id &&  <div className="flex items-center gap-1">
+                            <details className="dropdown">
+                                <summary className="m-1 flex items-center      gap-1">
+                                <span className="text-sm font-medium">{user?.name}</span>
+                                <FaRegUserCircle size={25} />
+                                </summary>
+                                <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-md w-52 right-0">
+                                    <li><Link to={'/user/dashboard'} className="rounded">Dashboard</Link></li>
+                                    <li><button onClick={() => dispatch(logoutUser()) } className="rounded">Logout</button></li>
+                                </ul>
+                            </details>
+                        </div>
+                        }
+                       
                     </div>
                 </div>
 

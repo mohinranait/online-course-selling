@@ -1,0 +1,5 @@
+
+.activeItem a.active {
+    background-color: rgb(40, 120, 235);
+    color: white;
+}
