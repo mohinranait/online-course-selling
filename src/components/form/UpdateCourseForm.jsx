@@ -75,7 +75,8 @@ const UpdateCourseForm = ({getCourse}) => {
         price : null,
         location: 'Online',
         certificate: 'Yes',
-        prerequisites: ''
+        prerequisites: '',
+        enrollmentStatus:""
     })
 
 
@@ -146,7 +147,8 @@ const UpdateCourseForm = ({getCourse}) => {
             price : getCourse?.price || null,
             location: getCourse?.location,
             certificate: getCourse?.certificate ?  'Yes' : "No" ,
-            prerequisites: getCourse?.prerequisites.join(',')
+            prerequisites: getCourse?.prerequisites.join(','),
+            enrollmentStatus: getCourse?.enrollmentStatus
         })
         const getDays = getCourse?.schedule?.split(' | ')[0].split(', ');
         let innArr = [];
@@ -325,6 +327,19 @@ const UpdateCourseForm = ({getCourse}) => {
                     onChange={(e) => setCourse({...course, prerequisites:e.target.value.split(',')})}
                     > </textarea>
                    </div>
+                   <div>
+                        <label htmlFor="" className='text-gray-600 text-sm'>Enrolment status</label>
+                        <select 
+                         id="" 
+                        className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                        onChange={(e) => setCourse({...course, enrollmentStatus:e.target.value})} 
+                        >
+                            <option value="Open">Active Status</option>
+                            <option value="Open" selected={course?.enrollmentStatus == 'Open'}>Open</option>
+                            <option value="Closed" selected={course?.enrollmentStatus == 'Closed'}>Closed</option>
+                            <option value="Progress" selected={course?.enrollmentStatus == 'Progress'}>Progress</option>
+                        </select>
+                    </div>
                     <textarea 
                     name="" id="" 
                     cols="30" rows="3" 

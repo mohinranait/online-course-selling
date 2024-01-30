@@ -56,7 +56,7 @@ const UserAccountForm = () => {
     return (
         <>
             <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="lg:grid grid-cols-2 gap-5">
+                <div className="grid lg:grid-cols-2 gap-5">
                     <Input 
                     type={'text'} 
                     placeholder={"Name"} 

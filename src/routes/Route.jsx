@@ -14,6 +14,7 @@ import UserAccount from "../pages/User/UserAccount";
 import PrivateRoute from "./PrivateRoute";
 import CourseCreate from "../pages/User/CourseCreate";
 import UpdateCourse from "../pages/User/UpdateCourse";
+import CourseVideo from "../pages/Videos/CourseVideo";
 const myRoutes = createBrowserRouter([
     {
         path:'/',
@@ -77,6 +78,10 @@ const myRoutes = createBrowserRouter([
                 ]
             },
         ]
+    },
+    {
+        path: '/course-purchase/:id',
+        element: <CourseVideo />,
     }
 ])
 

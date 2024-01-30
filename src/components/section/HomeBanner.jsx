@@ -12,12 +12,13 @@ const HomeBanner = () => {
                             <span className="text-base text-primary font-bold">100% QUALITY COURSES</span>
                         </div>
                         <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold py-4">Master the Skills to Drive <span className="text-primary">your Career</span> </h1>
-                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum unde eveniet illum aspernatur, ullam explicabo optio, quisquam quae, repellendus </p>
+                        <p>Free online courses from the world’s leading experts.
+Join 17 million learners today.</p>
                         <ul className="space-y-1">
-                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Lorem ipsum dolor sit amet.d</li>
-                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Lorem ipsum dolor sit amet.d</li>
-                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Lorem ipsum dolor sit amet.d</li>
-                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Lorem ipsum dolor sit amet.d</li>
+                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Learn the high-impact skills that top companies want.</li>
+                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Lifetime access opertunitys</li>
+                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Access more then 100K online courses.</li>
+                            <li className="flex gap-2 items-center"><CiCircleCheck className="text-primary" size={20} />Learn with experts from world-leading universities.</li>
                         </ul>
                     </div>
                     <div></div>

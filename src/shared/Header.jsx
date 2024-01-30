@@ -1,26 +1,59 @@
-import { Link } from "react-router-dom";
+/* eslint-disable react/prop-types */
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BsCart2 } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/features/user/authSlice";
+import { LuMenu } from "react-icons/lu";
+import Logo from "../components/logo/Logo";
+import qs from "query-string"
 
 
-
-const Header = () => {
+const Header = ({setIsToggle, isToggle}) => {
     const {user} = useSelector(state => state.user);
     const dispatch = useDispatch()
+    const navigate = useNavigate();
+    const location = useLocation();
+
+
+    const handleSearch = async e => {
+        e.preventDefault();
+
+        const value = e.target.search.value;
+        e.target.reset()
+        let cuerentQuery = {}
+        if(location?.search){
+            cuerentQuery = qs.parse(location?.search)
+        }
+
+        let updateQuery = {...cuerentQuery }
+
+        if(value){
+            updateQuery.search = value.toLowerCase();
+        }
+        const url = qs.stringifyUrl({
+            url: "/courses",
+            query : updateQuery,
+        })
+        navigate(url)
+
+       
+
+
+    }
     return (
         <header className="bg-white">
             <div className="box">
 
                 <div className="flex py-2 h-[80px] justify-between items-center">
                     <div className="flex gap-4 items-center">
-                        <Link to={'/'}>
-                            <img src="https://demo-themewinter.com/courselog/wp-content/uploads/2020/02/logo.png" className="w-32" alt="" />
-                        </Link>
-                        <form action="" className="border hidden overflow-hidden px-2 md:flex py-1 rounded-3xl ">
-                            <input type="text" className="px-3 py-2 bg-transparent outline-none " placeholder="Search course..." />
-                            <button className="bg-primary text-white rounded-3xl px-4 text-sm font-medium">Search</button>
+                        <div onClick={() => setIsToggle(!isToggle)} className="md:hidden cursor-pointer">
+                            <LuMenu  size={20} />
+                        </div>
+                        <Logo />
+                        <form onSubmit={handleSearch} className="border hidden overflow-hidden px-2 md:flex py-1 rounded-3xl ">
+                            <input type="text" name="search" className="px-3 py-2 bg-transparent outline-none " placeholder="Search course..." />
+                            <button type="submit" className="bg-primary text-white rounded-3xl px-4 text-sm font-medium">Search</button>
                         </form>
                     </div>
                     <div className="flex gap-5">
@@ -42,8 +75,8 @@ const Header = () => {
                         {
                             user?._id &&  <div className="flex items-center gap-1">
                             <details className="dropdown">
-                                <summary className="m-1 flex items-center      gap-1">
-                                <span className="text-sm font-medium">{user?.name}</span>
+                                <summary className="m-1 flex items-center cursor-pointer gap-1">
+                                <span className="text-sm hidden md:block font-medium">{user?.name}</span>
                                 <FaRegUserCircle size={25} />
                                 </summary>
                                 <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-md w-52 right-0">

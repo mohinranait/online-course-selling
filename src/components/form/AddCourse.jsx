@@ -67,10 +67,12 @@ const AddCourse = ({setAllCourse,allCourse,handleCloseModal}) => {
         descripton: "",
         category: data?.categorys[0],
         author : user?._id,
+        instructorName: user?.name,
         price : null,
         location: 'Online',
         certificate: 'Yes',
-        prerequisites: []
+        prerequisites: [],
+        enrollmentStatus:"Open"
     })
 
 
@@ -140,7 +142,7 @@ const AddCourse = ({setAllCourse,allCourse,handleCloseModal}) => {
         <>
             <form onSubmit={handleCourse} className="py-4">
                 <div className="space-y-5">
-                   <div className='lg:grid grid-cols-2 gap-5'>
+                   <div className='grid lg:grid-cols-2 gap-5'>
                         <div>
                             <label htmlFor="" className='text-gray-600 text-sm'>Course name</label>
                             <Input 
@@ -160,7 +162,7 @@ const AddCourse = ({setAllCourse,allCourse,handleCloseModal}) => {
                             />
                         </div>
                    </div>
-                    <div className='lg:grid grid-cols-4 gap-5'>
+                    <div className='grid lg:grid-cols-4 gap-5'>
                         <div>
                             <label htmlFor="" className='text-gray-600 text-sm'>Status</label>
                             <select 
@@ -282,6 +284,19 @@ const AddCourse = ({setAllCourse,allCourse,handleCloseModal}) => {
                     onChange={(e) => setCourse({...course, prerequisites:e.target.value.split(',')})}
                     > </textarea>
                    </div>
+                    <div>
+                        <label htmlFor="" className='text-gray-600 text-sm'>Enrolment status</label>
+                        <select 
+                         id="" 
+                        className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
+                        onChange={(e) => setCourse({...course, enrollmentStatus:e.target.value})} 
+                        >
+                            <option value="Open">Active Status</option>
+                            <option value="Open">Open</option>
+                            <option value="Closed">Closed</option>
+                            <option value="Progress">Progress</option>
+                        </select>
+                    </div>
                     <textarea 
                     name="" id="" 
                     cols="30" rows="3" 

@@ -33,16 +33,8 @@ const LoginForm = () => {
             const res = await axios.post(`/login`, formValue)
             if(res?.data?.success){
                 dispatch( addUser(res?.data?.user) );
-                // setUser(res.data.user);
-                // if(res.data?.user?.role == 'houseOwner'){
-                //     const path = JSON.parse(localStorage.getItem('path'));
-               
-                //     navigate(path ? path : res.data?.user?.role == 'houseOwner' ? '/owner/dashboard' : '/user/dashboard' )
-                //     localStorage.removeItem('path')
-                // }else{
-                //     navigate('/')
-                // }
                 setLoading(false)
+                navigate('/user/dashboard')
             }
         } catch (error) {
             setError(error.message)

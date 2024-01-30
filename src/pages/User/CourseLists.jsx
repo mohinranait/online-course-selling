@@ -18,7 +18,7 @@ const CourseLists = () => {
     useEffect(() => {
         const getCourse = async () => {
             const res = await axios.get(`/courses?author=${user?._id}`)
-            console.log(res.data.courses);
+            // console.log(res.data.courses);
             if(res.data.success){
                 setCourse(res.data.courses)
             }
@@ -28,9 +28,9 @@ const CourseLists = () => {
 
     return (
         <div>
-            <button onClick={()=>document.getElementById('my_modal_4').showModal()} className="px-4 py-2 bg-primary text-white rounded ">New course</button>
-            <Link to="/user/new-course" className="px-4 py-2 bg-primary text-white rounded inline-block ml-3 ">course</Link>
-            <div className="overflow-x-auto mt-8">
+            {/* <button onClick={()=>document.getElementById('my_modal_4').showModal()} className="px-4 py-2 bg-primary text-white rounded ">New course</button> */}
+            <Link to="/user/new-course" className="px-4 py-2 bg-primary text-white rounded inline-block ">New course</Link>
+            <div className="overflow-x-auto bg-white mt-8">
                 <table className="table table-zebra">
                     {/* head */}
                     <thead>

@@ -9,9 +9,9 @@ const UserLayout = () => {
        <main className="mt-8 mb-10">
             <section className="">
                 <div className="box">
-                    <div className="grid grid-cols-5 gap-5">
-                        <div className="col-span-1">
-                            <div className="border rounded-md py-8">
+                    <div className="lg:grid grid-cols-5 gap-5">
+                        <div className="col-span-1         mb-8">
+                            <div className="border bg-white rounded-md py-8">
                                 <div className="mb-3">
                                     <img className="w-[120px] h-[120px] mx-auto rounded-full ring-4 ring-gray-200" src={ user?.avater ? user?.avater : "https://demo-themewinter.com/courselog/wp-content/uploads/learn-press-profile/19/ac6a1c0685e30ffed22b99c763961dde.png"} alt="" />
                                     <p className="text-center font-medium mt-2">{user?.name}</p>

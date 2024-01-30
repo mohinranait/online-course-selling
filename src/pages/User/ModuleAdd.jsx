@@ -2,63 +2,62 @@
 import { FaRegCirclePlay } from "react-icons/fa6";
 import Input from "../../components/Input/Input";
 import ButtonPrimary from "../../components/buttons/ButtonPrimary";
-import { useLoaderData } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { FaUnlock } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import {useEffect, useState} from "react"
 import { toast } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
 import { useSelector } from "react-redux";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const ModuleAdd = () => {
-    const {course} = useLoaderData();
+    const [course, setCourse] = useState({});
+    const {id} = useParams();
+    const axiosPublic= useAxiosPublic();
     const [courseModules, setCourseModules] = useState([]);
     const {user} = useSelector(state => state.user)
     const axios = useAxios();
     const [allSyllabus, setAllSyllabus]= useState([]);
     const [modules, setModules] = useState([])
-    const [syllabus, setSyllabus] = useState({
-        week: null,
-        topic: '',
-        content: '',
-    })
-    const [formModule, setFormModuel] = useState({
-        modules: {
-            duration: '',
-            name: '',
-            isLock: "lock",
-            video: '',
-            weeklySyllabus:'',
-        }
-    })
+
+   
 
 
     const handleSubmitModule = async e => {
         e.preventDefault();
 
-        const {modules} = formModule;
-        console.log(formModule);
+        const form = e.target;
+        const duration = form.duration.value;
+        const name = form.name.value;
+        const isLock = form.isLock.value || true;
+        const video = form.video.value;
+        const weeklySyllabus = form.weeklySyllabus.value;
 
-        if( !modules.name ) return toast.error("Name is required")
-        if( !modules.duration ) return toast.error("Duration is required")
+        if( !name ) return toast.error("Name is required")
+        if( !duration ) return toast.error("Duration is required")
+        if( !weeklySyllabus ) return toast.error("Week is required")
+        if( !video ) return toast.error("Video link is required")
 
         try {
             const formate = {
-                ...modules , 
-                duration: Number(modules.duration),
-                weeklySyllabus: Number(modules.weeklySyllabus),
-                isLock: modules.isLock == 'lock' ? true : false, 
+                duration: Number(duration),
+                weeklySyllabus: Number(weeklySyllabus),
+                isLock: isLock == 'lock' ? true : false || "lock", 
+                video,
+                name
             } 
             const updateObj = {
-                totalDuration: Number(modules.duration) + course.modules?.reduce((acc, cur) => acc + cur?.duration , 0 ),
+                totalDuration: Number(duration) + course.modules?.reduce((acc, cur) => acc + cur?.duration , 0 ),
                 modules : [
                     ...course.modules ,
                     formate
                 ]
             }
-            // console.log(updateObj);
+
             const res = await axios.patch(`/course/${course?._id}?userId=${user?._id}`, updateObj);
             setModules(res.data?.course?.modules);
+            form.reset();
             document.getElementById('my_modal_4').close()
         } catch (error) {
             toast.error(error.message)
@@ -69,26 +68,35 @@ const ModuleAdd = () => {
     const handleSubmitSyllabus = async e => {
         e.preventDefault();
 
-        const {week, topic, content} = syllabus;
+        const form = e.target;
+        const week = form.week.value;
+        const topic = form.topic.value;
+        const content = form.content.value;
+
         if( !week ) return toast.error("Week is required")
         if( !topic ) return toast.error("Topic is required")
-        if( !content ) return toast.error("Content is required")
-
+        // if( !content ) return toast.error("Content is required")
+        const obj = {
+            week,
+            topic,               
+            content
+        }
         const weekObj = [
             ...course.syllabus,
-            syllabus
+            obj
         ]
 
         try {
-           
             const res = await axios.patch(`/course/${course?._id}?userId=${user?._id}`, {syllabus:weekObj});
-            // setModules(res.data?.course?.modules);
-            console.log(res.data?.course?.syllabus);
+            if(res.data.success){
+                setAllSyllabus(res.data?.course?.syllabus)
+                form.reset();
+            }
             document.getElementById('my_modal_5').close()
+           
         } catch (error) {
             toast.error(error.message)
         }
-
     }
 
     useEffect(() => {
@@ -111,21 +119,20 @@ const ModuleAdd = () => {
             }
         })
         setCourseModules(courseModules);
+       
     },[allSyllabus, modules])
 
 
 
     useEffect(() => {
-        setFormModuel({
-            modules: {
-                duration: '',
-                name: '',
-                isLock: "lock",
-                video: '',
-                weeklySyllabus:'',
-            }
-        })
-    },[modules])
+        const currentCourse = async () => {
+            const res = await axiosPublic(`/course/${id}`)
+            setCourse(res.data?.course);
+        }
+        currentCourse();
+    },[allSyllabus, modules,id])
+
+
     return (
         <>
             <div>
@@ -155,9 +162,9 @@ const ModuleAdd = () => {
                             <div className="space-y-5">
                                 <div className="grid lg:grid-cols-2 gap-5">
                                     <select 
-                                    name="" id="" 
+                                    name="weeklySyllabus" id="" 
                                     className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
-                                    onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, weeklySyllabus:e.target.value }})} 
+                                    // onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, weeklySyllabus:e.target.value }})} 
                                     >
                                         <option value="">Select week</option>
                                         {
@@ -165,9 +172,9 @@ const ModuleAdd = () => {
                                         }
                                     </select>
                                     <select 
-                                    name="" id="" 
+                                    name="isLock" id="" 
                                     className='py-2 w-full outline-none border px-3 rounded focus-visible:border-primary transition-all '
-                                    onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, isLock:e.target.value }})} 
+                                    // onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, isLock:e.target.value }})} 
                                     >
                                         <option value="lock">Lock</option>
                                         <option value="unlock">Unlock</option>
@@ -176,22 +183,25 @@ const ModuleAdd = () => {
                                 <Input 
                                 type={'text'} 
                                 placeholder={"Name"} 
-                                value={formModule.modules.name} 
-                                onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, name:e.target.value }})} 
+                                name="name"
+                                // value={formModule.modules.name} 
+                                // onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, name:e.target.value }})} 
                                 />
                                
                                
                                 <Input
                                  type={'number'} 
                                  placeholder={"Duration"} 
-                                 value={formModule.modules.duration} 
-                                 onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, duration:e.target.value }})} 
+                                 name="duration"
+                                //  value={formModule.modules.duration} 
+                                //  onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, duration:e.target.value }})} 
                                  />
                                 <Input
                                  type={'text'} 
                                  placeholder={"Video link"} 
-                                 value={formModule.modules.video} 
-                                 onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, video:e.target.value }})} 
+                                 name={'video'}
+                                //  value={formModule.modules.video} 
+                                //  onChange={(e) => setFormModuel({...formModule, modules:{ ...formModule.modules, video:e.target.value }})} 
                                  />
                                 <div>
                                     <ButtonPrimary type={'submit'} options={'w-full'}>
@@ -215,26 +225,36 @@ const ModuleAdd = () => {
                         </div>
                         <form onSubmit={handleSubmitSyllabus} className="py-4">
                             <div className="space-y-5">
+                               <div>
+                               <label htmlFor="" className="text-sm text-gray-600">Week number</label>
                                 <Input 
-                                type={'number'} 
-                                placeholder={"Week"} 
-                                value={syllabus.week} 
-                                onChange={(e) => setSyllabus({...syllabus, week: e.target.value })} 
-                                />
+                                    type={'number'} 
+                                    name="week"
+                                    placeholder={"Week"} 
+                                  
+                                    />
+                               </div>
                                
-                                <Input
+                               <div>
+                               <label htmlFor="" className="text-sm text-gray-600">Module topic</label>
+                                 <Input
                                  type={'text'} 
                                  placeholder={"Topic"} 
-                                 value={syllabus?.topic} 
-                                 onChange={(e) => setSyllabus({...syllabus, topic: e.target.value })} 
+                                 name="topic"
                                  />
+                               </div>
                                
-                                <Input
-                                 type={'text'} 
-                                 placeholder={"Content"} 
-                                 value={syllabus?.content} 
-                                 onChange={(e) => setSyllabus({...syllabus, content: e.target.value })} 
-                                 />
+                               
+                                <div>
+                                <label htmlFor="" className="text-sm text-gray-600">Module summery</label>
+                                    <Input
+                                    type={'text'} 
+                                    placeholder={"Content"} 
+                                    name="content"
+                                  
+                                    />
+                                </div>
+                               
                                
                                 <div>
                                     <ButtonPrimary type={'submit'} options={'w-full'}>

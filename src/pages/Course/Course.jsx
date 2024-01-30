@@ -4,7 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 
 import { GrNotes } from "react-icons/gr";
 import { IoIosStar } from "react-icons/io";
-import {Link, useLoaderData} from "react-router-dom"
+import {Link, useLoaderData, useNavigate} from "react-router-dom"
 import { LiaAngleRightSolid } from "react-icons/lia";
 import { CiClock2 } from "react-icons/ci";
 import { BsTranslate } from "react-icons/bs";
@@ -13,6 +13,9 @@ import Rating from "react-rating"
 import CourseRatingItem from "../../components/ratings/CourseRatingItem";
 import { HiOutlineBadgeCheck } from "react-icons/hi";
 import { GiNetworkBars } from "react-icons/gi";
+import { useSelector } from "react-redux";
+import useAxios from "../../hooks/useAxios";
+import { toast } from "react-toastify";
 
 
 const isTabs = [
@@ -28,6 +31,9 @@ const Course = () => {
     const [courseModules, setCourseModules] = useState([]);
     const [isToggle, setIsToggle] = useState('Overview')
     const {course} = useLoaderData();
+    const {user} = useSelector(state => state.user);
+    const navigate = useNavigate();
+    const axios = useAxios();
 
     useEffect(() => {
         const filterModuels = course?.syllabus?.map(item => {
@@ -44,21 +50,51 @@ const Course = () => {
         })
         setCourseModules(filterModuels);
     },[course])
-console.log(courseModules);
+
+    const handleOrder = async () => {
+
+
+        if(!user?._id){
+            navigate("/login");
+            return;
+        }
+        const orderObj = {
+            course: course?._id,
+            courseAuthor: course?.autor?._id,
+            courseReciver: user?._id,
+        }
+        try {
+            const exists = await axios.get(`/course-exists?courseId=${course?._id}`);
+            if(exists){
+                toast.success('You have alrady enrolled in this course');
+                return;
+            }
+            const res = await axios.post(`/order?userId=${user?._id}`, orderObj);
+
+            if(res.data?.success){
+                toast.success("Buy successfully");
+                navigate("/user/dashboard")
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+
     return (
        <>
             <section>
                 <div className="box flex items-center my-6">
                     <div className="grid w-full lg:grid-cols-4 py-8 bg-gradient-to-r to-cyan-500 from-blue-500 px-7 rounded-md">
                         <div className="lg:col-span-3 space-y-4">
-                            <ul className="flex items-center gap-4 text-sm text-gray-200 pb-4">
+                            <ul className="flex flex-wrap items-center gap-1 md:gap-4 text-sm text-gray-200 pb-4">
                                 <li><Link to="/" className="text-gray-300 font-medium">Home</Link></li> <LiaAngleRightSolid />
                                 <li><Link to="/" className="text-gray-300 font-medium">Course</Link></li> <LiaAngleRightSolid />
                                 <li><span>{course?.name}</span></li>
                             </ul>
-                            <h1 className="text-3xl xl:text-4xl font-bold text-white ">{course?.name}</h1>
-                            <p className="text-gray-200">{course?.descripton}</p>
-                            <ul className="flex items-center gap-4 ">
+                            <h1 className="text-2xl md:2xl xl:text-4xl font-bold text-white ">{course?.name}</h1>
+                            <p className="text-gray-200">{ course?.descripton.length > 190 ? course?.descripton.slice(0,190) + '...' : course?.descripton }</p>
+                            <ul className="flex flex-wrap md:flex-nowrap items-center gap-4 ">
                                 <li className="flex items-center gap-1 text-sm text-white font-medium"><FaRegUser size={18} /> <span>{course?.totalStudents?.length} Students</span> </li>
                                 <li className="flex items-center gap-1 text-sm text-white font-medium"><GrNotes size={18} /> <span>1 Lession</span> </li>
                                 <li className="flex items-center gap-1 text-sm text-white font-medium"><FiClock size={18} /> <span>{course?.totalDuration} Minutes</span> </li>
@@ -88,21 +124,21 @@ console.log(courseModules);
                     <div className="lg:grid lg:grid-cols-6 gap-5">
                         <div className="lg:col-span-4 ">
                             <div>
-                                <ul className="flex gap-4 items-center">
+                                <ul className="flex flex-wrap md:flex-nowrap gap-4 items-center">
                                     {
                                         isTabs?.map(item => <li key={item?._id} onClick={() => setIsToggle(item?.label) } className={`w-full inline-block  py-4 rounded-md  text-center font-medium cursor-pointer ${isToggle == item?.label ? 'bg-primary text-white':'text-gray-800 bg-white'} `}>{item?.value}</li> )
                                     }
                                 </ul>
 
                                 <div className={`mt-7 ${isToggle == 'Overview' ? 'block' :'hidden'} `}>
-                                    <p className="text-3xl font-semibold ">Course Description</p>
+                                    <p className="text-xl md:text-3xl font-semibold ">Course Description</p>
                                     <div className="space-y-3 mt-3">
                                     <p>{course?.descripton}</p>
                                     </div>
                                 </div>
                                 {/* Curriculum */}
                                 <div className={`mt-7 ${isToggle == 'Curriculum' ? 'block' :'hidden'} `}>
-                                    <p className="text-3xl font-semibold ">Course Curriculum</p>
+                                    <p className="text-xl md:text-3xll font-semibold ">Course Curriculum</p>
                                     <div className="space-y-3 mt-4">
                                        
                                         <div className="bg-white rounded-md p-8">
@@ -151,7 +187,7 @@ console.log(courseModules);
                                 </div>
                                 {/* Instructor */}
                                 <div className={`mt-7 ${isToggle == 'Instructor' ? 'block' :'hidden'} `}>
-                                    <p className="text-3xl font-semibold ">Course Instructors</p>
+                                    <p className="text-xl md:text-3xl font-semibold ">Course Instructors</p>
                                     <div className="space-y-3 mt-3">
                                     <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Hic ipsa similique minima dicta esse, laborum, amet, id repudiandae debitis incidunt unde eveniet eligendi sunt facere .</p>
                                    
@@ -184,7 +220,7 @@ console.log(courseModules);
                                 </div>
                                 {/* Reviews */}
                                 <div className={`mt-7 ${isToggle == 'Reviews' ? 'block' :'hidden'} `}>
-                                    <p className="text-3xl font-semibold ">Course Instructors</p>
+                                    <p className="text-xl md:text-3xl font-semibold ">Course Instructors</p>
                                     <div className="space-y-3 mt-3">
                                     <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Hic ipsa similique minima dicta esse, laborum, amet, id repudiandae debitis incidunt unde eveniet eligendi sunt facere .</p>
                                    
@@ -215,7 +251,7 @@ console.log(courseModules);
 
                                     <form action="" className="space-y-5 mt-16">
                                         <p className="text-2xl text-gray-700 font-medium">Comments</p>
-                                        <div className="lg:grid gap-5   grid-cols-2">
+                                        <div className="grid gap-5   md:grid-cols-2">
                                             <input type="text" className="w-full py-3 px-3 outline-none bg-white border border-gray-200 rounded" placeholder="Name..." />
                                             <input type="text" className="w-full py-3 px-3 outline-none bg-white border border-gray-200 rounded" placeholder="Email..." />
                                         </div>
@@ -230,7 +266,7 @@ console.log(courseModules);
                                 </div>
                             </div>
                         </div>
-                        <div className="col-span-2 ">
+                        <div className="col-span-2 mt-16 lg:mt-0">
                             <div className="border rounded-md bg-white overflow-hidden">
                                 <div className="mb-7">
                                     <img src={course?.image ? course?.image : "https://www.radiustheme.com/demo/wordpress/themes/quiklearn/wp-content/uploads/2023/07/crs_img_1-380x277.jpg"} className="w-full" alt="" />
@@ -240,7 +276,15 @@ console.log(courseModules);
                                         <span >Pay</span>
                                         <span className="text-primary">$ {course?.price}</span>
                                     </div>
-                                    <button className="w-full rounded-md py-3 text-center text-white bg-primary font-medium">Buy now</button>
+                                    {
+                                        course?.enrollmentStatus == "Open" ? 
+                                        <button onClick={() => handleOrder()} className="w-full rounded-md py-3 text-center text-white bg-primary font-medium">Click and Enrolle</button>
+                                        : course?.enrollmentStatus == "Closed" ? 
+                                        <button type="button" className="w-full rounded-md py-3 cursor-default text-center text-white bg-primary bg-opacity-70 font-medium">Enrolle close</button>
+                                        : course?.enrollmentStatus == "Progress" ? 
+                                        <button onClick={() => handleOrder()} className="w-full rounded-md py-3 text-center text-white bg-primary font-medium">Enrolle close</button>: ''
+                                    }
+                                    
                                 </div>
                                 <div className="px-5">
                                     <span className="text-xl font-semibold text-gray-800  inline-block">This Course Includes:</span>
