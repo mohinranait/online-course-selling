@@ -8,26 +8,40 @@ const UserDashboard = () => {
     const {user} = useSelector(state => state.user)
     const axios = useAxios();
     const [myOrders, setMyOrders] = useState([]);
+    const [ownCourse, setOwnCourse] = useState(0)
 
+
+    useEffect(() => {
+        const getCourse = async () => {
+            const res = await axios.get(`/courses?author=${user?._id}`)
+            // console.log(res.data.courses);
+            if(res.data.success){
+                setOwnCourse(res.data?.courses?.length)
+            }
+        };
+        getCourse();
+    },[])
+    
 
     useEffect(() => {
         const getOrders = async () => {
             const res = await axios.get(`/orders?userId=${user?._id}&request=customer`);
             setMyOrders(res.data?.orders);
-            console.log(res.data?.orders);
         };
         getOrders();
     },[])
+
+
     return (
         <div>
             <div className="md:grid grid-cols-3 gap-5">
                 <div className="bg-white p-5 rounded-md border ">
-                    <p className="text-3xl font-bold text-gray-800 text-center">0</p>
-                    <p className="text-gray-500 text-sm text-center">Purchace</p>
+                    <p className="text-3xl font-bold text-gray-800 text-center">{myOrders?.length}</p>
+                    <p className="text-gray-500 text-sm text-center">Enrolled</p>
                 </div>
                 <div className="bg-white p-5 rounded-md border ">
-                    <p className="text-3xl font-bold text-gray-800 text-center">0</p>
-                    <p className="text-gray-500 text-sm text-center">Comleted</p>
+                    <p className="text-3xl font-bold text-gray-800 text-center">{ownCourse}</p>
+                    <p className="text-gray-500 text-sm text-center">Your course</p>
                 </div>
                 
                 <div className="bg-white p-5 rounded-md border ">
@@ -36,7 +50,10 @@ const UserDashboard = () => {
                 </div>
             </div>
 
-            <div className="mt-10 bg-white">
+    
+            <p className="mb-2 mt-8 text-xl  font-bold text-gray-700">Enroll course</p>
+            <div className=" bg-white">
+                
                 <div className="overflow-x-auto">
                     <table className="table  table-zebra">
                         {/* head */}
@@ -45,7 +62,6 @@ const UserDashboard = () => {
                            
                             <th>Course</th>
                             <th>Progress</th>
-                            <th>Favorite Color</th>
                             <th>Order Status</th>
                         </tr>
                         </thead>
@@ -76,7 +92,6 @@ const UserDashboard = () => {
                                     <div className="radial-progress text-primary" style={{"--value":70}} role="progressbar">70%</div>
                                     {/* <progress className="progress progress-success w-56" value={30} max="100"></progress> */}
                                 </td>
-                                <td>Purple</td>
                                 <th>
                                     <button className="btn btn-success text-green-500 hover:bg-green-500 hover:bg-opacity-10 btn-sm bg-opacity-10 ">details</button>
                                 </th>

@@ -29,7 +29,11 @@ const CourseLists = () => {
     return (
         <div>
             {/* <button onClick={()=>document.getElementById('my_modal_4').showModal()} className="px-4 py-2 bg-primary text-white rounded ">New course</button> */}
-            <Link to="/user/new-course" className="px-4 py-2 bg-primary text-white rounded inline-block ">New course</Link>
+          
+            <div className="flex items-center justify-between">
+                <p className=" text-xl  font-bold text-gray-700">Your course</p>
+                <Link to="/user/new-course" className="px-4 py-2 bg-primary text-white rounded inline-block ">New course</Link>
+            </div>
             <div className="overflow-x-auto bg-white mt-8">
                 <table className="table table-zebra">
                     {/* head */}

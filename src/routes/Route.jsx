@@ -15,6 +15,8 @@ import PrivateRoute from "./PrivateRoute";
 import CourseCreate from "../pages/User/CourseCreate";
 import UpdateCourse from "../pages/User/UpdateCourse";
 import CourseVideo from "../pages/Videos/CourseVideo";
+import EnrollCourse from "../pages/User/EnrollCourse";
+import InstructorWishCourse from "../pages/InstructorWish/InstructorWishCourse";
 const myRoutes = createBrowserRouter([
     {
         path:'/',
@@ -42,6 +44,11 @@ const myRoutes = createBrowserRouter([
                 loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
             },
             {
+                path: "/instructor/:id",
+                element : <InstructorWishCourse />,
+                // loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
+            },
+            {
                 path: "/user",
                 element : <PrivateRoute><UserLayout /></PrivateRoute> ,
                 children: [
@@ -61,6 +68,10 @@ const myRoutes = createBrowserRouter([
                         path: "module-manage/:id",
                         element: <ModuleAdd />,
                         loader: async ({params}) => await fetch(`${import.meta.env.VITE_SERVER_PORT}/course/${params.id}`)
+                    },
+                    {
+                        path: "enroll",
+                        element: <EnrollCourse />,
                     },
                     {
                         path: "account",

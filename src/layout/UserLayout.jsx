@@ -21,7 +21,8 @@ const UserLayout = () => {
                                 <ul className="p-4 activeItem">
                                     <li><NavLink  to={'/user/dashboard'} className="w-full py-2 px-3 rounded-md hover:bg-gray-100 text-gray-800 inline-block">Dashboard</NavLink></li>
                                     <li><NavLink  to={'/user/account'} className="w-full py-2 px-3 rounded-md hover:bg-gray-100 text-gray-800 inline-block">Account</NavLink></li>
-                                    <li><NavLink  to={'/user/your-course'} className="w-full py-2 px-3 rounded-md hover:bg-gray-100 text-gray-800 inline-block">Course Sells</NavLink></li>
+                                    <li><NavLink  to={'/user/enroll'} className="w-full py-2 px-3 rounded-md hover:bg-gray-100 text-gray-800 inline-block">Enroll course</NavLink></li>
+                                    <li><NavLink  to={'/user/your-course'} className="w-full py-2 px-3 rounded-md hover:bg-gray-100 text-gray-800 inline-block">Sells course</NavLink></li>
                                 </ul>
                             </div>
                         </div>

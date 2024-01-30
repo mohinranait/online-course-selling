@@ -12,8 +12,8 @@ const Courses = () => {
     const [courses, setCourse]= useState([])
     const [toggleFetch, setToggleFetch] = useState(true)
 
-    const [category, setCategory] = useState(null);
     const [language, setLanguage] = useState(null);
+    const [category, setCategory] = useState(null);
     const [skills, setSkills] = useState(null);
     const [reqFil, setReqFill] = useState('createdAt');
     const [isOrder, setIsOrder] = useState('desc');

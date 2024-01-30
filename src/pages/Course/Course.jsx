@@ -65,7 +65,7 @@ const Course = () => {
         }
         try {
             const exists = await axios.get(`/course-exists?courseId=${course?._id}`);
-            if(exists){
+            if(exists.data.exists){
                 toast.success('You have alrady enrolled in this course');
                 return;
             }
@@ -96,7 +96,7 @@ const Course = () => {
                             <p className="text-gray-200">{ course?.descripton.length > 190 ? course?.descripton.slice(0,190) + '...' : course?.descripton }</p>
                             <ul className="flex flex-wrap md:flex-nowrap items-center gap-4 ">
                                 <li className="flex items-center gap-1 text-sm text-white font-medium"><FaRegUser size={18} /> <span>{course?.totalStudents?.length} Students</span> </li>
-                                <li className="flex items-center gap-1 text-sm text-white font-medium"><GrNotes size={18} /> <span>1 Lession</span> </li>
+                                <li className="flex items-center gap-1 text-sm text-white font-medium"><GrNotes size={18} /> <span>{courseModules?.length} Weeks</span> </li>
                                 <li className="flex items-center gap-1 text-sm text-white font-medium"><FiClock size={18} /> <span>{course?.totalDuration} Minutes</span> </li>
                             </ul>
                             <div className="flex gap-4">
@@ -199,7 +199,7 @@ const Course = () => {
                                             </span>
                                         </div>
                                         <div>
-                                            <p><Link to={'/'} className="text-xl font-bold ">{course?.author?.name}</Link></p>
+                                            <p><Link to={`/instructor/${course?.author?._id}`} className="text-xl font-bold ">{course?.author?.name}</Link></p>
                                             <ul className="flex items-center gap-4 mt-2">
                                                 <li className="flex items-center gap-1 text-sm text-gray-600 font-medium"><FaRegUser size={18} /> <span>120 Students</span> </li>
                                                 <li className="flex items-center gap-1 text-sm text-gray-600 font-medium"><GrNotes size={18} /> <span>6 Lession</span> </li>
